@@ -6,7 +6,8 @@
   "dependencies": {
     "@types/body-parser": "^1.19.2",
     "body-parser": "^1.20.1",
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "express-validator": "^6.14.2"
   },
   "scripts": {
     "watchTS": "tsc -w",
