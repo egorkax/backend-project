@@ -18,11 +18,7 @@ export const productsRepositoryDb = {
         const res = await productsCollection.deleteOne({id: id})
         return res.deletedCount === 1;
     },
-    async createProduct(newTitle: string): Promise<ProductType> {
-        let newProduct = {
-            id: +(new Date()),
-            title: newTitle
-        }
+    async createProduct(newProduct: ProductType): Promise<ProductType> {
         const result = await productsCollection.insertOne(newProduct)
         return newProduct
     },
