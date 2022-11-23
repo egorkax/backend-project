@@ -1,7 +1,8 @@
 import {Request, Response, Router} from "express";
-import {productsRepository, ProductType} from "../repositories/products-repository";
 import {body} from "express-validator";
 import {inputValidationMiddleware} from "../midlewares/input-validation-middleware";
+import {productsRepositoryDb,} from "../repositories/products-repository-db";
+import {ProductType} from "../repositories/db-repositories";
 
 export const productRouter = Router({})
 
@@ -12,21 +13,21 @@ const titleValidation = body('title').trim().isLength({
 
 productRouter.get('/', async (req: Request, res: Response) => {
     let searchString = req.query.title?.toString()
-    const foundProducts:ProductType[] = await productsRepository.filteredProducts(searchString)
+    const foundProducts:ProductType[] = await productsRepositoryDb.filteredProducts(searchString)
     res.send(foundProducts)
 
 
 })
 
-productRouter.get('/:id', (req: Request, res: Response) => {
+productRouter.get('/:id', async (req: Request, res: Response) => {
     let uriParams = +req.params.id
-    let product = productsRepository.findProduct(uriParams)
+    let product:ProductType | null =  await productsRepositoryDb.findProduct(uriParams)
     res.send(product)
 })
 
-productRouter.delete('/:id', (req: Request, res: Response) => {
+productRouter.delete('/:id', async (req: Request, res: Response) => {
     let uriParams = +req.params.id
-    let isDelete = productsRepository.deleteProduct(uriParams)
+    let isDelete:boolean = await productsRepositoryDb.deleteProduct(uriParams)
     if (isDelete) res.status(200)
     else res.status(400)
 
@@ -34,16 +35,16 @@ productRouter.delete('/:id', (req: Request, res: Response) => {
 
 productRouter.post('/', titleValidation, inputValidationMiddleware, async (req: Request, res: Response) => {
     let newTitle = req.body.title
-    let product :ProductType = await productsRepository.createProduct(newTitle)
+    let product :ProductType = await productsRepositoryDb.createProduct(newTitle)
     res.status(200).send(product)
 })
 
 productRouter.put('/:id', titleValidation,inputValidationMiddleware,async (req: Request, res: Response) => {
     let uriParams = +req.params.id
     let newTitle = req.body.title
-    let isUpdated:boolean = await productsRepository.updateProduct(newTitle, uriParams)
+    let isUpdated:boolean = await productsRepositoryDb.updateProduct(newTitle, uriParams)
     if (isUpdated) {
-        const product = productsRepository.findProduct(uriParams)
+        const product = await productsRepositoryDb.findProduct(uriParams)
         res.status(200).send(product)
     } else res.status(404)
 })

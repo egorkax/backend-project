@@ -11,10 +11,12 @@ export const productsRepository = {
             return products.filter(e => e.title.indexOf(title) > -1)
         } else return products
     },
-    findProduct(id: number) {
-        return products.find(e => e.id === id)
+    async  findProduct(id: number): Promise<ProductType | null> {
+        let product= products.find(e => e.id === id)
+        if(product)return product
+        else return null
     },
-    deleteProduct(id: number) {
+    async  deleteProduct(id: number) {
         for (let i = 0; i < products.length; i++) {
             if (products[i].id === id) {
                 products.splice(i, 1)
@@ -23,7 +25,7 @@ export const productsRepository = {
         }
         return false
     },
-   async createProduct(newTitle: string):Promise<ProductType> {
+    async createProduct(newTitle: string):Promise<ProductType> {
         let newProduct = {
             id: +(new Date()),
             title: newTitle
