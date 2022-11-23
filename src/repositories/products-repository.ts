@@ -1,7 +1,12 @@
-const products = [{id: 1, title: "tomato"}, {id: 2, title: "cucumber"}, {id: 3, title: "potato"}]
+
+export type ProductType={
+    id:number
+    title:string
+}
+const products:ProductType[] = [{id: 1, title: "tomato"}, {id: 2, title: "cucumber"}, {id: 3, title: "potato"}]
 
 export const productsRepository = {
-    filteredProducts(title: string | undefined) {
+    async filteredProducts(title: string | undefined):Promise<ProductType[]> {
         if (title) {
             return products.filter(e => e.title.indexOf(title) > -1)
         } else return products
@@ -18,7 +23,7 @@ export const productsRepository = {
         }
         return false
     },
-    createProduct(newTitle: string) {
+   async createProduct(newTitle: string):Promise<ProductType> {
         let newProduct = {
             id: +(new Date()),
             title: newTitle
@@ -26,7 +31,7 @@ export const productsRepository = {
         products.push(newProduct)
         return newProduct
     },
-    updateProduct(newTitle: string, id: number) {
+    async updateProduct(newTitle: string, id: number):Promise<boolean> {
         let product = products.find(e => e.id === id)
         if (product) {
             product.title = newTitle

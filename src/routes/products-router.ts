@@ -1,6 +1,6 @@
 import {Request, Response, Router} from "express";
-import {productsRepository} from "../repositories/products-repository";
-import {body, validationResult} from "express-validator";
+import {productsRepository, ProductType} from "../repositories/products-repository";
+import {body} from "express-validator";
 import {inputValidationMiddleware} from "../midlewares/input-validation-middleware";
 
 export const productRouter = Router({})
@@ -10,9 +10,9 @@ const titleValidation = body('title').trim().isLength({
     max: 12
 }).withMessage('Title should be from 2 to 12 symbols ')
 
-productRouter.get('/', (req: Request, res: Response) => {
+productRouter.get('/', async (req: Request, res: Response) => {
     let searchString = req.query.title?.toString()
-    const foundProducts = productsRepository.filteredProducts(searchString)
+    const foundProducts:ProductType[] = await productsRepository.filteredProducts(searchString)
     res.send(foundProducts)
 
 
@@ -32,16 +32,16 @@ productRouter.delete('/:id', (req: Request, res: Response) => {
 
 })
 
-productRouter.post('/', titleValidation, inputValidationMiddleware, (req: Request, res: Response) => {
+productRouter.post('/', titleValidation, inputValidationMiddleware, async (req: Request, res: Response) => {
     let newTitle = req.body.title
-    let product = productsRepository.createProduct(newTitle)
+    let product :ProductType = await productsRepository.createProduct(newTitle)
     res.status(200).send(product)
 })
 
-productRouter.put('/:id', titleValidation,inputValidationMiddleware, (req: Request, res: Response) => {
+productRouter.put('/:id', titleValidation,inputValidationMiddleware,async (req: Request, res: Response) => {
     let uriParams = +req.params.id
     let newTitle = req.body.title
-    let isUpdated = productsRepository.updateProduct(newTitle, uriParams)
+    let isUpdated:boolean = await productsRepository.updateProduct(newTitle, uriParams)
     if (isUpdated) {
         const product = productsRepository.findProduct(uriParams)
         res.status(200).send(product)
